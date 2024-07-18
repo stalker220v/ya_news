@@ -80,3 +80,10 @@ LOGIN_URL = reverse_lazy('users:login')
 LOGIN_REDIRECT_URL = reverse_lazy('news:home')
 
 NEWS_COUNT_ON_HOME_PAGE = 10
+
+URL = {
+    'detail': 'news:detail',
+    'home': 'news:home',
+    'delete': 'news:delete',
+    'edit': 'news:edit',
+}
