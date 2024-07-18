@@ -1,6 +1,8 @@
 # conftest.py
 import pytest
-
+from datetime import datetime, timedelta
+from django.utils import timezone
+from django.conf import settings
 # Импортируем класс клиента.
 from django.test.client import Client
 
@@ -50,4 +52,36 @@ def news_id(news):
 @pytest.fixture
 def comment_id(comment):
     return (comment.id,)
+
+@pytest.fixture
+def news10_in_one_page(author):
+    today = timezone.now()
+    all_news = []
+    for index in range(settings.NEWS_COUNT_ON_HOME_PAGE + 1):
+        news = News(
+            title=f'Новость {index}',
+            text='Просто текст.',
+            # Для каждой новости уменьшаем дату на index дней от today,
+            # где index - счётчик цикла.
+            date=today - timedelta(days=index)
+        )
+        all_news.append(news)
+    news_10 = News.objects.bulk_create(all_news)
+    return news_10
+
+@pytest.fixture
+def comment10_in_one_page_news(author, news):
+    now = timezone.now()
+    all_comment = []
+    for index in range(10):
+        comment = Comment.objects.create(
+            news=news, author=author, text=f'Tекст {index}',
+        )
+        # Сразу после создания меняем время создания комментария.
+        comment.created = now + timedelta(days=index)
+        # И сохраняем эти изменения.
+        comment.save()
+        all_comment.append(comment)
+    return all_comment
+
 
